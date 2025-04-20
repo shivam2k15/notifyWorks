@@ -30,7 +30,7 @@ const sendEmail = async (mailOptions) => {
   }
 };
 
-const getJob = async (followerEmails, title, description) => {
+const getEmailJob = async (followerEmails, title, description) => {
   const job = await emailQueue.add(
     "send-email",
     {
@@ -98,4 +98,4 @@ const createEmailWorker = () => {
   });
 };
 
-module.exports = { createEmailWorker, getJob };
+module.exports = { createEmailWorker, getEmailJob };

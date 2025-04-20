@@ -1,5 +1,19 @@
-const { getJob } = require("./emailWorker");
-const { pool } = require("./db");
+const { pool } = require("../db");
+const { getSocketJob } = require("../workers/socketWorker");
+const { getEmailJob } = require("../workers/emailWorker");
+const { createNotifications } = require("./notificationController");
+
+const getPosts = async (req, res, next) => {
+  try {
+    const response = await pool.query("select * from posts");
+    res.json(response.rows);
+  } catch (error) {
+    return next({
+      status: 500,
+      message: error.message || "Something went Wrong",
+    });
+  }
+};
 
 const createPost = async (req, res, next) => {
   try {
@@ -31,13 +45,15 @@ const createPost = async (req, res, next) => {
         .status(200)
         .json({ message: "Post created, but no followers to notify." }); //  No followers is not an error.
     }
-
+    let allEmails = followerEmails.map((item) => item.email);
+    let allIds = followerEmails.map((item) => item.id);
     // Add a job to the queue for sending emails
-    let job = await getJob(followerEmails, title, description);
 
-    console.log(
-      `Email job added to queue for post: ${title}, Job ID: ${job.id}`
-    );
+    await Promise.allSettled([
+      getEmailJob(allEmails, title, description),
+      getSocketJob(allIds, title),
+      createNotifications(userId, allIds, title, description),
+    ]);
 
     res.status(201).json({
       message: "Post created and notifications queued.",
@@ -54,46 +70,13 @@ const createPost = async (req, res, next) => {
 const getFollowerEmails = async (userId) => {
   console.log(`Fetching follower emails for user: ${userId}`);
   const query = {
-    text: "SELECT email FROM users join followers f on f.follower_id=users.id  WHERE f.user_id = $1",
+    text: "SELECT email, users.id as id FROM users join followers f on f.follower_id=users.id  WHERE f.user_id = $1",
     values: [
       userId, // userId1,
     ],
   };
   const allEmails = await pool.query(query);
-  return allEmails.rows.map(item=>item.email);
+  return allEmails.rows;
 };
 
-const getPosts = async (req, res, next) => {
-  try {
-    const response = await pool.query("select * from posts");
-    res.json(response.rows);
-  } catch (error) {
-    return next({
-      status: 500,
-      message: error.message || "Something went Wrong",
-    });
-  }
-};
-
-const updateNotification = async (req, res, next) => {
-  try {
-    const { notificationId } = req.body;
-
-    // Input validation
-    if (!notificationId) {
-      return next({
-        status: 400,
-        message: "notificationId is required.",
-      });
-    }
-    res.json({ message: "Updated Succesfully" });
-  } catch (error) {
-    console.error("Error updating notifications:", error);
-    return next({
-      status: 500,
-      message: "Error updating notifications",
-    });
-  }
-};
-
-module.exports = { createPost, updateNotification, getPosts };
+module.exports = { createPost, getPosts };
