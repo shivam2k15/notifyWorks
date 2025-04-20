@@ -21,4 +21,4 @@ const connectToDB = () => {
     });
 };
 
-module.exports = { connectToDB };
+module.exports = { connectToDB, pool };
