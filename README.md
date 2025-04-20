@@ -1,6 +1,7 @@
 ### NotifyWorks
+---
 
-## Notification System for the next-gen social web App. To keep users engaged, the platform will need to notify people of activity from people they follow, people who follow them or from people who discover their content organically.
+ Notification System for the next-gen social web App. To keep users engaged, the platform will need to notify people of activity from people they follow, people who follow them or from people who discover their content organically.
 
 ### Architechture
 
