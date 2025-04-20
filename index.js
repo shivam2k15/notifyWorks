@@ -9,7 +9,7 @@ app.use(express.json());
 
 //  New API Endpoint: Create Post and Notify Followers
 //  Added validation and error handling, and uses the queue.
-app.post("/", route);
+app.use("/", route);
 
 //   Error Handling Middleware (Optional, but recommended)
 app.use(errorHandler);

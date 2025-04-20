@@ -42,7 +42,11 @@ const getFollowerEmails = async (userId) => {
   console.log(`Fetching follower emails for user: ${userId}`);
 };
 
-const getPosts = async (req, res, next) => {};
+const getPosts = async (req, res, next) => {
+  res.json({
+    message: "Hello good to see you happy",
+  });
+};
 
 const updateNotification = async (req, res, next) => {
   try {
@@ -65,4 +69,4 @@ const updateNotification = async (req, res, next) => {
   }
 };
 
-module.exports = { createPost, updateNotification };
+module.exports = { createPost, updateNotification, getPosts };
