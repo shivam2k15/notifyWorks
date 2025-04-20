@@ -3,7 +3,8 @@ const { errorHandler } = require("./middleware");
 require("dotenv").config(); // Load environment variables
 const route = require("./route");
 // const worker = require("./emailWorker");
-
+const { connectToDB } = require("./db");
+connectToDB();
 const app = express();
 app.use(express.json());
 
