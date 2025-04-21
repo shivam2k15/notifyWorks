@@ -1,6 +1,6 @@
 const { pool } = require("../db");
-// const { getSocketJob } = require("../workers/socketWorker");
-// const { getEmailJob } = require("../workers/emailWorker");
+const { getSocketJob } = require("../workers/socketWorker");
+const { getEmailJob } = require("../workers/emailWorker");
 const { createNotifications } = require("./notificationController");
 
 const getPosts = async (req, res, next) => {
@@ -54,8 +54,8 @@ const createPost = async (req, res, next) => {
     // Add a job to the queue for sending emails
 
     await Promise.allSettled([
-      // getEmailJob(allEmails, title, description),
-      // getSocketJob(allIds, title),
+      getEmailJob(allEmails, title, description),
+      getSocketJob(allIds, title),
       createNotifications(userId, allIds, title, description),
     ]);
 

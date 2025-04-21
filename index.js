@@ -6,8 +6,8 @@ require("dotenv").config(); // Load environment variables
 const postRouter = require("./routers/postRouter");
 const notificationRouter = require("./routers/notificationRouter");
 const userRouter = require("./routers/userRouter");
-// const { createSocketWorker } = require("./workers/socketWorker");
-// const { createEmailWorker } = require("./workers/emailWorker");
+const { createSocketWorker } = require("./workers/socketWorker");
+const { createEmailWorker } = require("./workers/emailWorker");
 const { errorHandler } = require("./middleware");
 const { connectToDB } = require("./db");
 
@@ -15,8 +15,8 @@ app.use(helmet());
 app.use(cors());
 connectToDB();
 app.use(express.json());
-// createSocketWorker();
-// createEmailWorker();
+createSocketWorker();
+createEmailWorker();
 
 //  New API Endpoint: Create Post and Notify Followers
 //  Added validation and error handling, and uses the queue.
