@@ -16,9 +16,9 @@ const createSocketWorker = () => {
     async (job) => {
       //sending for the new post created to all the followers
       const { from, to, title } = job.data;
-      console.log(job, "job");
+      console.log("new-post:", to, "job");
       to.forEach((followerId) => {
-        io.to("join" + followerId).emit("new-post:" + followerId, {
+        io.emit("new-post:" + followerId, {
           from,
           title,
         });
