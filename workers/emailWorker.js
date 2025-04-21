@@ -36,7 +36,7 @@ const getEmailJob = async (followerEmails, title, description) => {
     {
       to: followerEmails,
       subject: `New Post: ${title}`,
-      html: `<p>A new post "${title}" has been created.</p><p>${description}</p>`,
+      html: `<p>A new post "${title}" has been created.</p><p>${description}</p><p><a href="https://notify-psi-blush.vercel.app/">Click here</a> to read more.</p>`,
     },
     {
       // Add this to each job, so individual jobs can have their own options.
