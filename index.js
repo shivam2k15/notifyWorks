@@ -10,6 +10,7 @@ const { createSocketWorker } = require("./workers/socketWorker");
 const { createEmailWorker } = require("./workers/emailWorker");
 const { errorHandler } = require("./middleware");
 const { connectToDB } = require("./db");
+const httpsServer = require("./server");
 
 app.use(helmet());
 app.use(cors());
@@ -28,6 +29,11 @@ app.use(errorHandler);
 
 //  Start the Server
 const port = process.env.PORT || 4001;
-app.listen(port, "0.0.0.0", () => {
+app.get("/", (req, res) => {
+  res.send("🔒 Hello from secure EC2!");
+});
+
+// Create HTTPS server
+httpsServer.listen(port, "0.0.0.0", () => {
   console.log(`Server listening on port ${port}`);
 });

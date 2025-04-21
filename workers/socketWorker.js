@@ -1,5 +1,13 @@
 const { Queue, Worker } = require("bullmq");
-const io = require("socket.io");
+const { Server } = require("socket.io");
+const httpsServer = require("../server");
+
+const io = new Server(httpsServer, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
 //  Configure BullMQ Queue (for Jobs)
 const socketQueue = new Queue("socket-queue", {
@@ -45,7 +53,7 @@ const createSocketWorker = () => {
         host: "localhost",
         port: 6379,
       },
-      
+
       defaultJobOptions: {
         attempts: 3, // Number of retries
         backoff: {
