@@ -12,8 +12,10 @@
   "license": "ISC",
   "dependencies": {
     "bullmq": "^5.49.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "helmet": "^8.1.0",
     "nodemailer": "^6.10.1",
     "pg": "^8.14.1",
     "socket.io": "^4.8.1"

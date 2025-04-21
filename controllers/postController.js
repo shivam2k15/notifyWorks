@@ -1,11 +1,17 @@
 const { pool } = require("../db");
-const { getSocketJob } = require("../workers/socketWorker");
-const { getEmailJob } = require("../workers/emailWorker");
+// const { getSocketJob } = require("../workers/socketWorker");
+// const { getEmailJob } = require("../workers/emailWorker");
 const { createNotifications } = require("./notificationController");
 
 const getPosts = async (req, res, next) => {
   try {
-    const response = await pool.query("select * from posts");
+    const { page } = req.params;
+    let limit = 10;
+    const response = await pool.query(
+      `select * from posts ORDER BY created_at desc LIMIT ${limit} OFFSET ${
+        limit * (Number(page) - 1)
+      }`
+    );
     res.json(response.rows);
   } catch (error) {
     return next({
@@ -36,10 +42,8 @@ const createPost = async (req, res, next) => {
       ],
     };
     const postCreated = await pool.query(query);
-    console.log(postCreated, "post");
 
     const followerEmails = await getFollowerEmails(userId); // Await the promise
-    console.log(followerEmails, "followerEmails");
     if (!followerEmails || followerEmails.length === 0) {
       return res
         .status(200)
@@ -50,8 +54,8 @@ const createPost = async (req, res, next) => {
     // Add a job to the queue for sending emails
 
     await Promise.allSettled([
-      getEmailJob(allEmails, title, description),
-      getSocketJob(allIds, title),
+      // getEmailJob(allEmails, title, description),
+      // getSocketJob(allIds, title),
       createNotifications(userId, allIds, title, description),
     ]);
 

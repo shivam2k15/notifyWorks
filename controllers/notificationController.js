@@ -1,3 +1,4 @@
+const { pool } = require("../db");
 const updateNotification = async (req, res, next) => {
   try {
     const { notificationId } = req.body;
@@ -42,7 +43,6 @@ const createNotifications = async (userId, followerIds, title, description) => {
     text,
     values,
   };
-  console.log(query, "query");
   const postCreated = await pool.query(query);
 };
 
