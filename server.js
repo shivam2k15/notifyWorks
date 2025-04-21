@@ -1,4 +1,5 @@
 const https = require("https");
+const fs = require("fs");
 // Read certs
 const sslOptions = {
   key: fs.readFileSync("./ssl/server.key"),
