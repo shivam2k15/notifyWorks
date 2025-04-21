@@ -55,7 +55,7 @@ const createPost = async (req, res, next) => {
 
     await Promise.allSettled([
       getEmailJob(allEmails, title, description),
-      getSocketJob(allIds, title),
+      getSocketJob(userId, allIds, title),
       createNotifications(userId, allIds, title, description),
     ]);
 

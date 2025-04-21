@@ -9,10 +9,11 @@ const socketQueue = new Queue("socket-queue", {
   },
 });
 
-const getSocketJob = async (followerIds, title) => {
+const getSocketJob = async (userId, followerIds, title) => {
   const job = await socketQueue.add(
     "send-notification",
     {
+      from: userId,
       to: followerIds,
       title: `New Post: ${title}`,
     },
@@ -33,17 +34,18 @@ const createSocketWorker = () => {
   const socketWorker = new Worker(
     "socket-queue",
     async (job) => {
-      const { to, title } = job.data;
-
-      let result;
-      return result; // Return the result for tracking
+      //sending for the new post created to all the followers
+      const { from, to, title } = job.data;
+      to.forEach((followerId) => {
+        io.to(followerId).emit("new-post", { from, title });
+      });
     },
     {
       connection: {
         host: "localhost",
         port: 6379,
       },
-      // Add retry mechanism.  See https://github.com/taskforce/bullmq/blob/master/docs/README.md
+      
       defaultJobOptions: {
         attempts: 3, // Number of retries
         backoff: {
