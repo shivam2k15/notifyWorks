@@ -17,7 +17,7 @@ const createSocketWorker = () => {
       //sending for the new post created to all the followers
       const { from, to, title } = job.data;
       to.forEach((followerId) => {
-        io.to(followerId).emit("new-post", { from, title });
+        io.to(followerId).emit("new-post:" + followerId, { from, title });
       });
     },
     {
