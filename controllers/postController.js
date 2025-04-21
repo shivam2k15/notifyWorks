@@ -1,7 +1,36 @@
+const { Queue } = require("bullmq");
 const { pool } = require("../db");
-const { getSocketJob } = require("../workers/socketWorker");
 const { getEmailJob } = require("../workers/emailWorker");
 const { createNotifications } = require("./notificationController");
+
+//  Configure BullMQ Queue (for Jobs)
+const socketQueue = new Queue("socket-queue", {
+  connection: {
+    host: "localhost", // Default Redis host
+    port: 6379, // Default Redis port
+  },
+});
+
+const getSocketJob = async (userId, followerIds, title) => {
+  const job = await socketQueue.add(
+    "send-notification",
+    {
+      from: userId,
+      to: followerIds,
+      title: `New Post: ${title}`,
+    },
+    {
+      // Add this to each job, so individual jobs can have their own options.
+      attempts: 3,
+      backoff: {
+        type: "exponential",
+        delay: 1000,
+      },
+    }
+  );
+  return job;
+};
+
 
 const getPosts = async (req, res, next) => {
   try {

@@ -1,4 +1,4 @@
-const { Queue, Worker } = require("bullmq");
+const { Worker } = require("bullmq");
 const { Server } = require("socket.io");
 const httpsServer = require("../server");
 
@@ -8,34 +8,6 @@ const io = new Server(httpsServer, {
     methods: ["GET", "POST"],
   },
 });
-
-//  Configure BullMQ Queue (for Jobs)
-const socketQueue = new Queue("socket-queue", {
-  connection: {
-    host: "localhost", // Default Redis host
-    port: 6379, // Default Redis port
-  },
-});
-
-const getSocketJob = async (userId, followerIds, title) => {
-  const job = await socketQueue.add(
-    "send-notification",
-    {
-      from: userId,
-      to: followerIds,
-      title: `New Post: ${title}`,
-    },
-    {
-      // Add this to each job, so individual jobs can have their own options.
-      attempts: 3,
-      backoff: {
-        type: "exponential",
-        delay: 1000,
-      },
-    }
-  );
-  return job;
-};
 
 const createSocketWorker = () => {
   //  Define the  Worker (to process jobs from the queue)
@@ -78,4 +50,4 @@ const createSocketWorker = () => {
   });
 };
 
-module.exports = { createSocketWorker, getSocketJob };
+module.exports = { createSocketWorker };
