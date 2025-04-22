@@ -83,14 +83,14 @@ const getUserFollowers = async (req, res, next) => {
       });
     }
     const query = {
-      text: " Select u.id, name,email from users u join followers f on f.follower_id= u.id where user_id = ($1)",
+      text: "Select u.id, name,email from users u join followers f on f.follower_id= u.id where user_id = ($1)",
       values: [userId],
     };
 
     let user = await pool.query(query);
 
     const queryNonFollowers = {
-      text: "SELECT u.id, u.name, u.email FROM users u LEFT JOIN followers f ON f.follower_id = u.id AND f.user_id = $1 WHERE f.follower_id IS NULL AND u.id != $1;",
+      text: "SELECT u.id, u.name, u.email FROM users u LEFT JOIN followers f ON u.id = f.user_id AND f.follower_id = ($1) WHERE f.user_id IS NULL",
       values: [userId],
     };
 
