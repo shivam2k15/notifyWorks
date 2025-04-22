@@ -73,13 +73,22 @@ const getUserFollowers = async (req, res, next) => {
       });
     }
     const query = {
-      text: " Select name,email from users u join followers f on f.follower_id= u.id where user_id = ($1)",
+      text: " Select u.id, name,email from users u join followers f on f.follower_id= u.id where user_id = ($1)",
       values: [userId],
     };
 
     let user = await pool.query(query);
 
-    res.json(user.rows);
+    const queryNonFollowers = {
+      text: "SELECT u.id, u.name, u.email FROM users u LEFT JOIN followers f ON f.follower_id = u.id AND f.user_id = $1 WHERE f.follower_id IS NULL AND u.id != $1;",
+      values: [userId],
+    };
+
+    let allNonfollowers = await pool.query(queryNonFollowers);
+    res.json({
+      allfollowers: user.rows,
+      allNonfollowers: allNonfollowers.rows,
+    });
   } catch (error) {
     console.error("Error creating user:", error);
     return next({
