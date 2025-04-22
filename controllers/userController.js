@@ -23,7 +23,7 @@ const createFollower = async (req, res, next) => {
 
     await Promise.allSettled([
       getEmailJob([email], name, "", "Follower"),
-      getSocketJob(userId, [followerId], name, "Follower"),
+      getSocketJob(followerId, [userId], name, "Follower"),
       createNotifications(userId, [followerId], "new follower " + name, ""),
     ]);
 
