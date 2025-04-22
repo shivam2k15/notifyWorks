@@ -11,13 +11,13 @@ const socketQueue = new Queue("socket-queue", {
   },
 });
 
-const getSocketJob = async (userId, followerIds, title) => {
+const getSocketJob = async (userId, followerIds, title, type) => {
   const job = await socketQueue.add(
     "send-notification",
     {
       from: userId,
       to: followerIds,
-      title: `New Post: ${title}`,
+      title: `New ${type}: ${title}`,
     },
     {
       // Add this to each job, so individual jobs can have their own options.
@@ -30,7 +30,6 @@ const getSocketJob = async (userId, followerIds, title) => {
   );
   return job;
 };
-
 
 const getPosts = async (req, res, next) => {
   try {
@@ -83,8 +82,8 @@ const createPost = async (req, res, next) => {
     // Add a job to the queue for sending emails
 
     await Promise.allSettled([
-      getEmailJob(allEmails, title, description),
-      getSocketJob(userId, allIds, title),
+      getEmailJob(allEmails, title, description, "Post"),
+      getSocketJob(userId, allIds, title, "Post"),
       createNotifications(userId, allIds, title, description),
     ]);
 
@@ -112,4 +111,4 @@ const getFollowerEmails = async (userId) => {
   return allEmails.rows;
 };
 
-module.exports = { createPost, getPosts };
+module.exports = { createPost, getPosts, getSocketJob };

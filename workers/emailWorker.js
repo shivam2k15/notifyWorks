@@ -30,13 +30,17 @@ const sendEmail = async (mailOptions) => {
   }
 };
 
-const getEmailJob = async (followerEmails, title, description) => {
+const getEmailJob = async (followerEmails, title, description, type) => {
   const job = await emailQueue.add(
     "send-email",
     {
       to: followerEmails,
-      subject: `New Post: ${title}`,
-      html: `<p>A new post "${title}" has been created.</p><p>${description}</p><p><a href="https://notify-psi-blush.vercel.app/">Click here</a> to read more.</p>`,
+      subject: `New ${type}: ${title}`,
+      html: `${
+        type == "Post"
+          ? `<p>A new ${type} ${title} has been created.</p><p>${description}</p><p><a href="https://notify-psi-blush.vercel.app/">Click here</a> to read more.</p>`
+          : `<p>A new ${type} ${title} started following you.</p><p>${description}</p><p><a href="https://notify-psi-blush.vercel.app/">Click here</a> to see.</p>`
+      }`,
     },
     {
       // Add this to each job, so individual jobs can have their own options.

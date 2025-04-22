@@ -1,14 +1,17 @@
 const { pool } = require("../db");
+const { getEmailJob } = require("../workers/emailWorker");
+const { createNotifications } = require("./notificationController");
+const { getSocketJob } = require("./postController");
 
 const createFollower = async (req, res, next) => {
   try {
-    const { userId, followerId } = req.body;
+    const { userId, followerId, name, email } = req.body;
 
     // Input validation
-    if (!userId || !followerId) {
+    if (!userId || !followerId || !name || !email) {
       return next({
         status: 400,
-        message: "Ids are required.",
+        message: "Enter all fields.",
       });
     }
 
@@ -17,6 +20,13 @@ const createFollower = async (req, res, next) => {
       values: [userId, followerId],
     };
     await pool.query(insertquery);
+
+    await Promise.allSettled([
+      getEmailJob([email], name, "", "Follower"),
+      getSocketJob(userId, [followerId], name, "Follower"),
+      createNotifications(userId, [followerId], "new follower " + name, ""),
+    ]);
+
     res.status(201).json({ message: "successfully created" });
   } catch (error) {
     console.error("Error creating follower:", error);
